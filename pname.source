@@ -1,0 +1,103 @@
+CREATE FUNCTION personname_in(cstring)
+   RETURNS personname
+   AS '_OBJWD_/pname'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION personname_out(personname)
+   RETURNS cstring
+   AS '_OBJWD_/pname'
+   LANGUAGE C IMMUTABLE STRICT;
+
+CREATE TYPE personname (
+   internallength = VARIABLE,
+   input = personname_in,
+   output = personname_out
+);
+
+CREATE FUNCTION personname_eq(personname, personname) RETURNS bool
+   AS '_OBJWD_/pname' LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION personname_neq(personname, personname) RETURNS bool
+   AS '_OBJWD_/pname' LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION personname_gt(personname, personname) RETURNS bool
+   AS '_OBJWD_/pname' LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION personname_lt(personname, personname) RETURNS bool
+   AS '_OBJWD_/pname' LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION personname_gte(personname, personname) RETURNS bool
+   AS '_OBJWD_/pname' LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION personname_lte(personname, personname) RETURNS bool
+   AS '_OBJWD_/pname' LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION family(personname) RETURNS TEXT
+   AS '_OBJWD_/pname' LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION given(personname) RETURNS TEXT
+   AS '_OBJWD_/pname' LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION show(personname) RETURNS TEXT
+   AS '_OBJWD_/pname' LANGUAGE C IMMUTABLE STRICT;
+   
+CREATE OPERATOR = (
+   LEFTARG = personname, RIGHTARG = personname, PROCEDURE = personname_eq,
+   COMMUTATOR = '=', NEGATOR = '<>',
+   RESTRICT = eqsel, JOIN = eqjoinsel , restrict = eqsel, HASHES
+);
+
+CREATE OPERATOR <> (
+   LEFTARG = personname, RIGHTARG = personname, PROCEDURE = personname_neq,
+   COMMUTATOR = '<>', NEGATOR = '=',
+   RESTRICT = neqsel, JOIN = neqjoinsel
+);
+
+CREATE OPERATOR > (
+   LEFTARG = personname, RIGHTARG = personname, PROCEDURE = personname_gt,
+   COMMUTATOR = '<', NEGATOR = '<=',
+   RESTRICT = scalarltsel, JOIN = scalarltjoinsel
+);
+
+CREATE OPERATOR < (
+   LEFTARG = personname, RIGHTARG = personname, PROCEDURE = personname_lt,
+   COMMUTATOR = '>', NEGATOR = '>=',
+   RESTRICT = scalargtsel, JOIN = scalargtjoinsel
+);
+
+CREATE OPERATOR >= (
+   LEFTARG = personname, RIGHTARG = personname, PROCEDURE = personname_gte,
+   COMMUTATOR = '<=', NEGATOR = '<',
+   RESTRICT = scalargtsel, JOIN = scalargtjoinsel
+);
+
+CREATE OPERATOR <= (
+   LEFTARG = personname, RIGHTARG = personname, PROCEDURE = personname_lte,
+   COMMUTATOR = '>=', NEGATOR = '>',
+   RESTRICT = scalarltsel, JOIN = scalarltjoinsel
+);
+
+-- create the support function
+
+CREATE FUNCTION personname_cmp(personname, personname) RETURNS int4
+   AS '_OBJWD_/pname' LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION personname_hash(personname) RETURNS int4
+   AS '_OBJWD_/pname' LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OPERATOR CLASS personname_ops
+    DEFAULT FOR TYPE personname USING btree AS
+    OPERATOR        1       <,
+    OPERATOR        2       <=,
+    OPERATOR        3       =,
+    OPERATOR        4       >=,
+    OPERATOR        5       >,
+    FUNCTION        1       personname_cmp(personname, personname);
+
+CREATE OPERATOR CLASS personname_ops
+DEFAULT FOR TYPE personname USING hash AS
+    OPERATOR    1   =  (personname, personname),
+    FUNCTION    1   personname_hash(personname);
+
+
+
